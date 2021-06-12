@@ -7,20 +7,29 @@ use PHPUnit\Framework\TestCase;
 
 class TagParserTest extends TestCase
 {
-  protected TagParser $parser;
 
-    protected function setup():void
-    {
-      $this->parser = new TagParser();
-
-    }
-
-  public function test_it_parses_a_single_tag()
+  /**
+   * @dataProvider tagsProvider
+   */
+  public function test_it_parses_a_single_tag($input,$expected)
   {
-    $result = $this->parser->parse("personal");
-    $expected =["personal"];
+    $parser = new TagParser();
+    $result = $parser->parse($input);
 
     $this->assertSame($expected,$result);
 
+  }
+
+  public function tagsProvider()
+  {
+    return [
+      ["personal",["personal"]],
+      ["personal, money, family",["personal","money", "family"]],
+      ["personal, money, family",["personal","money", "family"]],
+      ["personal | money | family",["personal","money", "family"]],
+      ["personal|money|family",["personal","money", "family"]],
+      ["personal!money!family",["personal","money", "family"]],
+
+    ];
   }
 }
