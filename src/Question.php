@@ -19,6 +19,11 @@ class Question
     $this->answer = $answer;
     return $this->correct = $answer === $this->solution;
   }
+
+  public function answered(){
+    return isset($this->answer);
+  }
+
   public function isCorrect()
   {
     return $this->correct;
