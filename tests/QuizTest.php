@@ -8,32 +8,46 @@ use PHPUnit\Framework\TestCase;
 
 class QuizTest extends TestCase
 {
+  protected Quiz $quiz;
+  public function setUp():void
+  {
+    $this->quiz = new Quiz;
+  }
   /** @test  */
   public function it_consists_of_question()
   {
-    $quiz = new Quiz();
-    $quiz->addQuestion(new Question('What is 2+2?',4));
-    $this->assertCount(1,$quiz->questions());
+    $this->quiz->addQuestion(new Question('What is 2+2?',4));
+    $this->assertCount(1,$this->quiz->questions());
   }
+
+  /** @test */
+  public function it_grades_a_perfect_quiz()
+  {
+    $this->quiz->addQuestion(new Question("What is 2 + 2?", 4));
+
+    $this->quiz->begin()->answer(4);
+
+    $this->assertEquals(100, $this->quiz->grade());
+  }
+  
 
   /** @test  */
-  public function it_can_be_graded ()
+  public function it_grades_a_failed_quiz()
   {
-    $quiz = new Quiz();
-    $quiz->addQuestion(new Question('What is 2+2?',4));
-    $question = $quiz->nextQuestion();
-    $question->answer(4);
-    $this->assertEquals(100,$quiz->grade());
-  }
+    $this->quiz->addQuestion(new Question("What is 2 + 2?", 4));
 
+    $this->quiz->nextQuestion()->answer("incorrect answer");
+
+    $this->assertEquals(0, $this->quiz->grade());
+  }
   /** @test  */
   public function it_correctly_tracks_the_next_qustion_in_the_queue()
   {
-    $quiz = new Quiz();
-    $quiz->addQuestion($question1 = new Question("What is 2 + 2?", 4));
-    $quiz->addQuestion($question2 = new Question("What is 3 + 3?", 6));
-    $this->assertEquals($question1, $quiz->nextQuestion());
-    $this->assertEquals($question2, $quiz->nextQuestion());
+ 
+    $this->quiz->addQuestion($question1 = new Question("What is 2 + 2?", 4));
+    $this->quiz->addQuestion($question2 = new Question("What is 3 + 3?", 6));
+    $this->assertEquals($question1, $this->quiz->nextQuestion());
+    $this->assertEquals($question2, $this->quiz->nextQuestion());
 
   }
 
@@ -55,14 +69,13 @@ class QuizTest extends TestCase
     $quiz->grade();
 
   }
-  // /** @test  */
-  // public function it_knows_if_it_is_complete()
-  // {
-  //   $quiz = new Quiz();
-  //   $quiz->addQuestion(new Question("What is 2 + 2?", 4));
-  //   $quiz->nextQuestion()->answer(4);
-  //   $this->aswer
-
-    
-  // }
+  /** @test  */
+  public function it_knows_if_it_is_complete()
+  {
+    $quiz = new Quiz();
+    $quiz->addQuestion(new Question("What is 2 + 2?", 4));
+    $this->assertFalse($quiz->isComplete());    
+    $quiz->nextQuestion()->answer(4);
+    $this->assertTrue($quiz->isComplete());    
+  }
 }
